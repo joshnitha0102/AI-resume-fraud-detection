@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="box">
+    <h2>Resume Fraud Detection</h2>
+
+```
+<input type="file" id="fileInput" />
+<br>
+<button onclick="uploadFile()">Analyze</button>
+
+<p id="status"></p>
+
+<h3>Result:</h3>
+<div id="result"></div>
+
+<br>
+<button onclick="logout()">Logout</button>
+```
+
+  </div>
+
+  <script>
+    async function uploadFile() {
+      const file = document.getElementById('fileInput').files[0];
+
+      if (!file) {
+        alert("Select a file");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      document.getElementById("status").innerText = "Uploading...";
+
+      try {
+        const res = await fetch("http://localhost:8080/api/resume/analyze", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        document.getElementById("status").innerText = "Done ✅";
+
+        document.getElementById("result").innerHTML = `
+          <p><b>Risk Level:</b> ${data.riskLevel}</p>
+          <p><b>Fraud Score:</b> ${data.fraudScore}</p>
+          <p><b>Skills:</b> ${data.skillsAnalysis.detectedSkills.join(", ")}</p>
+          <p><b>Summary:</b> ${data.aiSummary}</p>
+        `;
+
+      } catch (e) {
+        document.getElementById("status").innerText = "Error ❌";
+      }
+    }
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+  </script>
+
+</body>
+</html>
